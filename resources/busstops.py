@@ -46,8 +46,9 @@ class BusStops(Resource):
     def get(self):
         vendorid=get_jwt_claims()['vendorid']
         parser=reqparse.RequestParser()
-        parser.add_argument('routeId',type=int)
+        parser.add_argument('routeId',type=string)
         data=parser.parse_args()
+        routeId=int(data['routeId'])
         if data['routeId']==None:
             try:
                 routeids=query(f"""SELECT DISTINCT bs.routeId FROM BusStops bs, Bus b
@@ -64,7 +65,7 @@ class BusStops(Resource):
         else:
             try:
                 return query(f"""SELECT busStopNum,busStopName,latitude,longitude FROM BusStops bs, Bus b
-                                 WHERE bs.routeId=b.routeId AND bs.routeId={data['routeId']} AND b.vendorId={vendorid}
+                                 WHERE bs.routeId=b.routeId AND bs.routeId={routeId} AND b.vendorId={vendorid}
                                  ORDER BY busStopNum""")
             except:
                 return {"message" : "An error occurred while accessing BusStops table."}, 500
